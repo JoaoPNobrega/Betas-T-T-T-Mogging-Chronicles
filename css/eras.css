@@ -1,0 +1,53 @@
+body.era-medieval {
+    background-image: linear-gradient(160deg, #2b1b16, #132010 60%, #0f0b05);
+}
+
+body.era-medieval .fighters {
+    background: url('../assets/medieval/README.txt') center/cover, rgba(43, 33, 23, 0.6);
+    background-blend-mode: multiply;
+}
+
+body.era-medieval .abilities,
+body.era-medieval .log {
+    background: rgba(39, 28, 19, 0.8);
+}
+
+body.era-medieval .action-button {
+    background: linear-gradient(140deg, rgba(116, 82, 49, 0.9), rgba(73, 53, 32, 0.7));
+}
+
+body.era-moderna {
+    background-image: linear-gradient(160deg, #1f1b2c, #31274d 55%, #141222);
+}
+
+body.era-moderna .fighters {
+    background: url('../assets/moderna/README.txt') center/cover, rgba(24, 21, 33, 0.7);
+    background-blend-mode: lighten;
+}
+
+body.era-moderna .action-button {
+    background: linear-gradient(140deg, rgba(134, 79, 193, 0.8), rgba(61, 41, 103, 0.8));
+}
+
+body.era-moderna .player-panel.active-turn {
+    border-color: #9f74ff;
+    box-shadow: 0 18px 40px rgba(159, 116, 255, 0.35);
+}
+
+body.era-futurista {
+    background-image: radial-gradient(circle at top, #0f1c3f, #04060f 70%);
+}
+
+body.era-futurista .fighters {
+    background: url('../assets/futurista/README.txt') center/cover, rgba(14, 26, 51, 0.75);
+    background-blend-mode: screen;
+}
+
+body.era-futurista .action-button {
+    background: linear-gradient(150deg, rgba(0, 217, 255, 0.8), rgba(140, 76, 255, 0.8));
+}
+
+body.era-futurista .brutal-banner {
+    color: #7cfff0;
+    text-shadow: 0 0 20px rgba(124, 255, 240, 0.7);
+}
