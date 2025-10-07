@@ -6,16 +6,16 @@ export class Jogador {
         this.hp = this.maxHP;
         this.defesaAtiva = false;
         this.vitorias = 0;
+        this.sinergiaBonus = 0;
         this.painel = painel;
         this.spriteElement = spriteElement;
-        this.speechBubble = null;
-        this.bubbleTimeout = null;
+        this.avatar = null;
 
         if (this.spriteElement) {
             this.spriteElement.dataset.classe = this.classe;
-            this.speechBubble = document.createElement('div');
-            this.speechBubble.className = 'speech-bubble';
-            this.spriteElement.appendChild(this.speechBubble);
+            this.avatar = document.createElement('div');
+            this.avatar.className = 'sprite-avatar';
+            this.spriteElement.appendChild(this.avatar);
         }
 
         this.atualizarPainel();
@@ -45,10 +45,13 @@ export class Jogador {
     resetarHP() {
         this.hp = this.maxHP;
         this.defesaAtiva = false;
+        this.sinergiaBonus = 0;
         this.atualizarHP();
         this.marcarDefesa(false);
-        this.limparProvocacao();
         this.limparEfeitosSprite();
+        if (this.avatar) {
+            this.avatar.classList.remove('sync-ready', 'sync-charge');
+        }
     }
 
     ativarDefesa() {
@@ -63,6 +66,23 @@ export class Jogador {
         this.atualizarHP();
         this.marcarDefesa(false);
         return dano;
+    }
+
+    prepararSinergia() {
+        this.sinergiaBonus = 8;
+        if (this.avatar) {
+            this.avatar.classList.add('sync-ready', 'sync-charge');
+            window.setTimeout(() => this.avatar?.classList.remove('sync-charge'), 700);
+        }
+    }
+
+    consumirSinergia() {
+        const bonus = this.sinergiaBonus;
+        if (this.avatar && bonus > 0) {
+            this.avatar.classList.remove('sync-ready');
+        }
+        this.sinergiaBonus = 0;
+        return bonus;
     }
 
     animarAtaque(efeito = 'impact') {
@@ -85,14 +105,6 @@ export class Jogador {
         }, 800);
     }
 
-    animarProvocacao() {
-        if (!this.spriteElement) return;
-        this.spriteElement.classList.add('taunt-glow');
-        window.setTimeout(() => {
-            this.spriteElement?.classList.remove('taunt-glow');
-        }, 1000);
-    }
-
     receberImpacto(efeito = 'impact') {
         if (!this.spriteElement) return;
         this.removerClassesTemporarias(['damage-flash', 'hit-slash', 'hit-impact', 'hit-tech', 'hit-shadow']);
@@ -104,21 +116,6 @@ export class Jogador {
             this.spriteElement?.classList.remove('damage-flash');
             this.spriteElement?.classList.remove(classeEfeito);
         }, 500);
-    }
-
-    mostrarProvocacao(frase) {
-        if (!this.speechBubble) return;
-        this.speechBubble.textContent = frase;
-        this.speechBubble.classList.add('visible');
-        if (this.bubbleTimeout) {
-            window.clearTimeout(this.bubbleTimeout);
-        }
-        this.bubbleTimeout = window.setTimeout(() => this.limparProvocacao(), 1800);
-    }
-
-    limparProvocacao() {
-        if (!this.speechBubble) return;
-        this.speechBubble.classList.remove('visible');
     }
 
     marcarDefesa(ativo) {
@@ -139,8 +136,7 @@ export class Jogador {
             'hit-impact',
             'hit-tech',
             'hit-shadow',
-            'guard-stance',
-            'taunt-glow'
+            'guard-stance'
         ];
         classes.forEach((classe) => this.spriteElement.classList.remove(classe));
     }

@@ -1,53 +1,53 @@
-body.era-medieval {
-    background-image: linear-gradient(160deg, #2b1b16, #132010 60%, #0f0b05);
+body.planet-aurora {
+    background-image: linear-gradient(160deg, #1b0f29, #10233d 55%, #04060f);
 }
 
-body.era-medieval .fighters {
-    background: url('../assets/medieval/README.txt') center/cover, rgba(43, 33, 23, 0.6);
-    background-blend-mode: multiply;
+body.planet-aurora .fighters {
+    background: linear-gradient(160deg, rgba(32, 18, 56, 0.75), rgba(14, 36, 64, 0.75));
+    box-shadow: inset 0 0 80px rgba(98, 164, 255, 0.25);
 }
 
-body.era-medieval .abilities,
-body.era-medieval .log {
-    background: rgba(39, 28, 19, 0.8);
+body.planet-aurora .action-button {
+    background: linear-gradient(140deg, rgba(144, 112, 255, 0.4), rgba(70, 212, 255, 0.35));
 }
 
-body.era-medieval .action-button {
-    background: linear-gradient(140deg, rgba(116, 82, 49, 0.9), rgba(73, 53, 32, 0.7));
+body.planet-aurora .player-panel.active-turn {
+    border-color: #7cc9ff;
+    box-shadow: 0 18px 40px rgba(124, 201, 255, 0.35);
 }
 
-body.era-moderna {
-    background-image: linear-gradient(160deg, #1f1b2c, #31274d 55%, #141222);
+body.planet-sucata {
+    background-image: linear-gradient(160deg, #24160b, #2b2020 55%, #0c0704);
 }
 
-body.era-moderna .fighters {
-    background: url('../assets/moderna/README.txt') center/cover, rgba(24, 21, 33, 0.7);
-    background-blend-mode: lighten;
+body.planet-sucata .fighters {
+    background: linear-gradient(160deg, rgba(64, 36, 19, 0.8), rgba(26, 21, 17, 0.8));
+    box-shadow: inset 0 0 80px rgba(255, 169, 76, 0.2);
 }
 
-body.era-moderna .action-button {
-    background: linear-gradient(140deg, rgba(134, 79, 193, 0.8), rgba(61, 41, 103, 0.8));
+body.planet-sucata .action-button {
+    background: linear-gradient(140deg, rgba(255, 190, 111, 0.35), rgba(140, 83, 44, 0.45));
 }
 
-body.era-moderna .player-panel.active-turn {
-    border-color: #9f74ff;
-    box-shadow: 0 18px 40px rgba(159, 116, 255, 0.35);
+body.planet-sucata .player-panel.active-turn {
+    border-color: #ffb663;
+    box-shadow: 0 18px 40px rgba(255, 182, 99, 0.35);
 }
 
-body.era-futurista {
-    background-image: radial-gradient(circle at top, #0f1c3f, #04060f 70%);
+body.planet-lua {
+    background-image: radial-gradient(circle at top, #150a24, #04060f 70%);
 }
 
-body.era-futurista .fighters {
-    background: url('../assets/futurista/README.txt') center/cover, rgba(14, 26, 51, 0.75);
-    background-blend-mode: screen;
+body.planet-lua .fighters {
+    background: linear-gradient(170deg, rgba(44, 16, 53, 0.75), rgba(9, 8, 31, 0.9));
+    box-shadow: inset 0 0 90px rgba(255, 120, 214, 0.25);
 }
 
-body.era-futurista .action-button {
-    background: linear-gradient(150deg, rgba(0, 217, 255, 0.8), rgba(140, 76, 255, 0.8));
+body.planet-lua .action-button {
+    background: linear-gradient(150deg, rgba(255, 120, 214, 0.4), rgba(120, 92, 255, 0.35));
 }
 
-body.era-futurista .brutal-banner {
-    color: #7cfff0;
-    text-shadow: 0 0 20px rgba(124, 255, 240, 0.7);
+body.planet-lua .brutal-banner {
+    color: #ff8bd9;
+    text-shadow: 0 0 20px rgba(255, 139, 217, 0.7);
 }

@@ -1,29 +1,32 @@
-# Betas Through Time: The Mogging Chronicles
+# Betas Through Space: The Mogging Chronicles
 
 ## Visão geral
-Jogo de luta em turnos para dois jogadores humanos que atravessam três eras —
-Medieval, Moderna e Futurista — para descobrir quem se torna o "Chad Supremo".
-O projeto foi desenvolvido apenas com HTML, CSS e JavaScript puros, mantendo a
-separação total entre marcação, estilos e lógica.
+Dois betinhas perdidos no espaço saltam de planeta em planeta atrás do drip
+supremo. Eles começam como parceiros contra sentinelas colossais, mas a jornada
+culmina na Lua da Perfidia, onde um precisará trair o outro para se tornar o
+Mogger Supremo. O projeto usa apenas HTML, CSS e JavaScript puros, com
+organização modular entre marcação, estilos e lógica.
 
 ## Funcionalidades atuais
-- **Duas páginas dedicadas**: tela inicial (`index.html`) para configurar nomes e
-  classes, e a arena (`game.html`) onde a partida acontece.
-- **Classes JavaScript** para representar jogadores, fases e o controlador do
-  jogo, com gerenciamento de turnos, HP, defesas, provocações e viagens no
-  tempo.
-- **Interface dinâmica** com placar reativo, tabela de log de ações,
-  atualização da lista de habilidades por era, animações de ataque/impacto e
-  troca de temas visuais.
-- **Fluxo de eras**: vitória mostra o banner "BRUTAL", libera viagem temporal,
-  reseta o log e aplica o novo tema. Ao vencer a última era o jogo pode ser
-  reiniciado.
+- **Duas páginas dedicadas**: tela inicial (`index.html`) para coletar nomes e
+  classes dos jogadores, e a arena (`game.html`) onde a partida acontece.
+- **Introdução estilo Star Wars**: um "crawl" com a lore do universo abre o
+  jogo e pode ser pulado a qualquer momento.
+- **Boss fights cooperativas**: nas duas primeiras fases, os jogadores
+  alternam turnos para derrubar um chefe planetário que devolve golpes
+  automáticos.
+- **Duelo final obrigatório**: ao chegar à Lua da Perfidia não há mais chefes —
+  os betas se enfrentam até restar apenas um.
+- **Classes JavaScript** (`Jogador`, `Fase` e `Jogo`) controlam HP, turnos,
+  lista de habilidades, sinergia e temas visuais por planeta.
+- **Interface dinâmica**: placares com barras de HP reativas, tabela de log,
+  lista de habilidades atualizada por fase, tema visual que muda entre planetas
+  e sprites estilizados inteiramente em CSS (sem depender de imagens externas).
+- **Ação "Sinergizar"**: canaliza energia estelar para turbinar o próximo
+  ataque com +8 de dano, incentivando a cooperação antes da traição.
 
-Com esses elementos o jogo está funcional para partidas locais entre dois
-jogadores na mesma tela.
-
-> **Escopo atual:** não há modo online nem persistência em disco/localStorage —
-> todo o foco está em partidas presenciais na mesma máquina.
+> **Escopo atual:** sem modo online, sem persistência e sem uso de áudio
+> externo. Toda a experiência ocorre localmente em uma única tela.
 
 ## Como executar localmente
 1. Abra um terminal na pasta do projeto.
@@ -35,65 +38,41 @@ jogadores na mesma tela.
    clique em **Iniciar Jogo**.
 
 ## Como jogar
-1. Os jogadores alternam turnos clicando nos botões **Atacar**, **Defender** ou
-   **Provocar**.
-2. Após zerar o HP do adversário, clique em **Viajar no Tempo** para avançar de
-   era com o vencedor da rodada.
-3. Repita até alguém vencer a Era Futurista e conquistar o título de Chad
-   Supremo. Utilize o mesmo botão para reiniciar o ciclo de eras.
+1. Escolha as classes e inicie a partida. Os jogadores se alternam clicando em
+   **Atacar**, **Defender** ou **Sinergizar**.
+2. Nos planetas **Aurora Prisma** e **Sucata Abissal**, cada ataque mira o
+   chefe local. Depois de um turno de jogador, o boss contra-ataca
+   automaticamente.
+3. Quando o HP do boss chegar a zero, o banner "PLANETA LIBERADO!" aparece e o
+   botão **Próximo salto planetário** é liberado.
+4. Caso um dos betas seja derrotado por um boss, o jogo mostra "DERROTA!" e
+   oferece **Reiniciar rota** para tentar novamente desde o primeiro planeta.
+5. Após vencer os dois planetas cooperativos, os betas aterrissam na **Lua da
+   Perfidia**, onde lutam entre si até que um vença com o banner "TRAIÇÃO!". O
+   botão **Reiniciar jornada** reinicia toda a rota.
 
-## Próximos passos sugeridos
-- Substituir os placeholders por sprites e sons reais usando as recomendações
-  abaixo.
-- Ajustar valores de dano/defesa conforme feedback das partidas para manter o
-  equilíbrio entre classes.
-- Criar uma camada de feedback adicional (ex.: flashes na arena ou variações de
-  iluminação) sincronizada com os golpes mais fortes.
+## Visual e assets
+- Os sprites dos jogadores e dos chefes são gerados via CSS (`.sprite-avatar` e
+  `.boss-sprite`), garantindo que o jogo funcione mesmo sem imagens externas.
+- As classes `planet-aurora`, `planet-sucata` e `planet-lua` aplicam temas
+  cromáticos diferentes a cada fase.
+- Caso deseje substituir as artes, basta trocar o conteúdo dos diretórios dentro
+  de `assets/` e adaptar os estilos em `css/main.css`.
+- O diretório `sounds/` permanece apenas como placeholder — nenhuma trilha é
+  carregada pelo código.
 
 ## Estrutura de pastas
 ```
-assets/   # diretórios reservados para sprites e artes das eras
-css/      # estilos globais e temas específicos de cada era
-js/       # classes Jogador, Fase e controlador Jogo + eventos da UI
-sounds/   # efeitos sonoros (reservados)
+assets/   # reservado para artes opcionais de planetas e interface
+css/      # estilos globais e temas específicos dos planetas
+js/       # classes Jogador, Fase, Jogo e inicialização de eventos
+sounds/   # reservado para efeitos sonoros (não utilizados nesta versão)
 ```
 
-## Recomendações de sprites e sons
-Para facilitar a troca dos placeholders, abaixo estão sugestões de arquivos,
-pasta de destino e o momento em que cada mídia é utilizada. Os nomes seguem o
-formato esperado pelo código; basta substituir os arquivos `README.txt` nos
-diretórios de sprites quando tiver os assets reais.
-
-### Sprites sugeridos
-| Pasta de destino | Arquivo sugerido | Uso recomendado |
-| --- | --- | --- |
-| `assets/medieval/` | `cavaleiro-medieval.png` | Sprite base do cavaleiro durante a Era Medieval. |
-| `assets/medieval/` | `bandido-medieval.png` | Sprite do bandido com trajes camponeses/malandros. |
-| `assets/medieval/` | `ciborgue-medieval.png` | Visual improvisado do ciborgue fora de época. |
-| `assets/moderna/` | `cavaleiro-moderna.png` | Evolução moderna do cavaleiro (street knight). |
-| `assets/moderna/` | `bandido-moderna.png` | Bandido urbano com grafites e acessórios neon. |
-| `assets/moderna/` | `ciborgue-moderna.png` | Corpo com upgrades RGB e gadgets atuais. |
-| `assets/futurista/` | `cavaleiro-futurista.png` | Armadura fotônica do cavaleiro na era final. |
-| `assets/futurista/` | `bandido-futurista.png` | Ladrão dimensional com capa digital. |
-| `assets/futurista/` | `ciborgue-futurista.png` | Design final com silhueta high-tech. |
-
-> Dica: utilize sprites com fundo transparente (PNG) e proporção aproximada de
-> 3:4 para encaixar bem nos contêineres das lutas.
-
-### Sons sugeridos
-| Pasta de destino | Arquivo sugerido | Evento no jogo |
-| --- | --- | --- |
-| `sounds/` | `attack-slash.mp3` | Tocado quando golpes com efeito `slash` são sorteados. |
-| `sounds/` | `attack-impact.mp3` | Usado para golpes de impacto (escudos, investidas, quedas). |
-| `sounds/` | `attack-tech.mp3` | Associado aos ataques tecnológicos/energéticos. |
-| `sounds/` | `attack-shadow.mp3` | Sugestão para golpes furtivos dos bandidos. |
-| `sounds/` | `defense-guard.mp3` | Ao acionar o botão **Defender**. |
-| `sounds/` | `taunt-meme.mp3` | Ao acionar **Provocar** (pode ser um efeito rápido de voz ou meme). |
-| `sounds/` | `era-transition.mp3` | Ao clicar em **Viajar no Tempo** e trocar a era. |
-| `sounds/` | `brutal.mp3` | Já reservado para o banner “BRUTAL!” — substitua pelo áudio final. |
-| `sounds/` | `victory.mp3` | Tema curto quando alguém vira Chad Supremo. |
-| `sounds/` | `teleport.mp3` | Efeito de portal usado junto do botão de viagem temporal. |
-
-Ao adicionar os arquivos, lembre-se de referenciá-los no código JavaScript em um
-futuro passo (por exemplo, disparando `Audio` específico conforme o `efeito` do
-golpe).
+## Próximas ideias
+- Ajustar o balanceamento de dano/defesa para que cada classe brilhe em fases
+  diferentes.
+- Criar animações extras (partículas, impactos no cenário) sincronizadas com os
+  golpes mais fortes.
+- Acrescentar novos planetas e bosses intermediários antes do duelo final.
+- Explorar uma versão online futura usando websockets, mantendo a base local.

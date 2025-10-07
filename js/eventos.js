@@ -20,6 +20,14 @@ function configurarBotoes(jogo) {
     });
 }
 
+function inicializarIntro() {
+    const intro = document.getElementById('space-intro');
+    if (!intro) return;
+    const esconder = () => intro.classList.add('hidden');
+    intro.addEventListener('click', esconder, { once: true });
+    window.setTimeout(esconder, 32000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const jogadoresInfo = obterParametros();
     const jogo = new Jogo({
@@ -27,4 +35,5 @@ document.addEventListener('DOMContentLoaded', () => {
         jogadoresInfo
     });
     configurarBotoes(jogo);
+    inicializarIntro();
 });

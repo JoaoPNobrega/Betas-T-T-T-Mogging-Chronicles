@@ -8,8 +8,17 @@ export class Jogo {
         this.logBody = document.querySelector('#log-table tbody');
         this.habilidadesList = document.getElementById('habilidades-list');
         this.brutalBanner = document.getElementById('brutal');
-        this.timeTravelBtn = document.getElementById('time-travel');
         this.actionButtons = Array.from(document.querySelectorAll('.action-button[data-action]'));
+        this.nextPhaseBtn = document.getElementById('next-phase');
+
+        this.bossPanel = {
+            container: document.getElementById('boss-panel'),
+            nome: document.getElementById('boss-name'),
+            desc: document.getElementById('boss-desc'),
+            hpFill: document.getElementById('boss-hp-fill'),
+            hpValue: document.getElementById('boss-hp-value')
+        };
+        this.bossSprite = document.getElementById('boss');
 
         this.turnoJogadorIndex = 0;
         this.turnCounter = 1;
@@ -18,6 +27,8 @@ export class Jogo {
         this.faseConcluida = false;
         this.vencedorAtual = null;
         this.campeonatoConcluido = false;
+        this.derrotaNaFase = false;
+        this.boss = null;
 
         this.jogadores = jogadoresInfo.map((info, index) => new Jogador({
             nome: info.nome,
@@ -33,6 +44,7 @@ export class Jogo {
         }));
 
         this.fases = FASES;
+        this.nextPhaseBtn.addEventListener('click', () => this.processarProximoSalto());
         this.iniciarFase(0, this.jogadores[0]);
     }
 
@@ -44,23 +56,65 @@ export class Jogo {
         this.faseConcluida = false;
         this.vencedorAtual = null;
         this.campeonatoConcluido = false;
+        this.derrotaNaFase = false;
+        this.boss = null;
         this.ocultarBrutal();
+        this.brutalBanner.textContent = 'BRUTAL!';
         this.limparLog();
         this.jogadores.forEach((jogador) => jogador.resetarHP());
         this.turnoJogadorIndex = this.jogadores.indexOf(jogadorInicial);
         if (this.turnoJogadorIndex === -1) {
             this.turnoJogadorIndex = 0;
         }
+        this.configurarBoss();
         this.atualizarPainelTurno();
         this.atualizarListaHabilidades();
-        this.timeTravelBtn.disabled = true;
-        this.timeTravelBtn.textContent = 'Viajar no Tempo';
         this.actionButtons.forEach((btn) => {
-            if (btn.dataset.action !== 'viajar') {
-                btn.disabled = false;
-            }
+            btn.disabled = false;
         });
-        this.adicionarLog('Narrador', `A batalha pela ${this.faseAtual.nome} começou!`);
+        this.nextPhaseBtn.disabled = true;
+        this.nextPhaseBtn.textContent = this.faseAtual.hasBoss() ? 'Próximo salto planetário' : 'Resolver destino final';
+        const narrativa = this.faseAtual.obterNarrativa();
+        if (narrativa) {
+            this.adicionarLog('Narrador', narrativa);
+        }
+    }
+
+    configurarBoss() {
+        if (this.faseAtual.hasBoss()) {
+            const dados = this.faseAtual.boss;
+            this.boss = {
+                nome: dados.nome,
+                descricao: dados.descricao,
+                maxHP: dados.maxHP,
+                hp: dados.maxHP,
+                ataques: dados.ataques || []
+            };
+            this.atualizarBossPainel();
+            this.bossPanel.container.classList.remove('hidden');
+            if (this.bossSprite) {
+                this.bossSprite.classList.remove('hidden');
+                this.bossSprite.dataset.boss = this.faseAtual.slug;
+            }
+        } else {
+            this.ocultarBoss();
+        }
+    }
+
+    ocultarBoss() {
+        this.bossPanel.container.classList.add('hidden');
+        if (this.bossSprite) {
+            this.bossSprite.classList.add('hidden');
+        }
+    }
+
+    atualizarBossPainel() {
+        if (!this.boss) return;
+        this.bossPanel.nome.textContent = this.boss.nome;
+        this.bossPanel.desc.textContent = this.boss.descricao;
+        const percentual = Math.max(0, (this.boss.hp / this.boss.maxHP) * 100);
+        this.bossPanel.hpFill.style.width = `${percentual}%`;
+        this.bossPanel.hpValue.textContent = `${this.boss.hp} / ${this.boss.maxHP}`;
     }
 
     atualizarPainelTurno() {
@@ -77,8 +131,13 @@ export class Jogo {
         const habilidades = this.faseAtual.listarHabilidades(jogadorAtual.classe);
         const extras = [
             'Defender — reduz pela metade o próximo dano recebido.',
-            'Provocar — dispara uma frase meme para desestabilizar o rival.'
+            'Sinergizar — canaliza energia estelar para turbinar o próximo ataque (+8 de dano).'
         ];
+        if (this.faseAtual.hasBoss() && this.boss) {
+            extras.push(`${this.boss.nome} — permaneçam coordenados para derrubar o guardião planetário.`);
+        } else {
+            extras.push('Duelo Final — todo golpe agora mira diretamente no ex-amigo.');
+        }
         this.habilidadesList.innerHTML = '';
         [...habilidades, ...extras].forEach((texto) => {
             const li = document.createElement('li');
@@ -88,50 +147,184 @@ export class Jogo {
     }
 
     executarAcao(acao) {
-        if (this.faseConcluida && acao !== 'viajar') {
+        if (this.faseConcluida) {
             return;
         }
 
         const jogadorAtual = this.jogadores[this.turnoJogadorIndex];
-        const oponente = this.jogadores[1 - this.turnoJogadorIndex];
+        const outroJogador = this.jogadores[1 - this.turnoJogadorIndex];
+        const dueloFinal = !this.faseAtual.hasBoss();
 
         switch (acao) {
             case 'atacar': {
-                const golpe = this.faseAtual.obterGolpeAleatorio(jogadorAtual.classe);
-                const variacao = Math.floor(Math.random() * 5);
-                const danoTotal = oponente.receberDano(golpe.dano + variacao);
-                jogadorAtual.animarAtaque(golpe.efeito || 'impact');
-                oponente.receberImpacto(golpe.efeito || 'impact');
-                const detalhe = golpe.descricao ? ` ${golpe.descricao}` : '';
-                this.adicionarLog(jogadorAtual.nome, `Atacou com ${golpe.nome} causando ${danoTotal} de dano.${detalhe}`);
-                if (!oponente.estaVivo()) {
-                    this.resolverVitoria(jogadorAtual, oponente);
-                }
+                this.processarAtaque(jogadorAtual, dueloFinal ? outroJogador : null);
                 break;
             }
             case 'defender': {
                 jogadorAtual.ativarDefesa();
-                this.adicionarLog(jogadorAtual.nome, 'Levantou a defesa! Próximo dano será reduzido.');
+                this.adicionarLog(jogadorAtual.nome, 'Levantou o escudo cósmico! Próximo dano será reduzido.');
                 jogadorAtual.animarDefesa();
                 break;
             }
-            case 'provocar': {
-                const frase = this.faseAtual.obterProvocacao();
-                this.adicionarLog(jogadorAtual.nome, `Provocou: “${frase}”`);
-                jogadorAtual.mostrarProvocacao(frase);
-                jogadorAtual.animarProvocacao();
+            case 'sinergia': {
+                jogadorAtual.prepararSinergia();
+                this.adicionarLog(jogadorAtual.nome, 'Canalizou sinergia estelar. Próximo ataque ganha +8 de dano!');
                 break;
-            }
-            case 'viajar': {
-                this.processarViagemTemporal();
-                return;
             }
             default:
                 return;
         }
 
+        if (this.faseConcluida) {
+            return;
+        }
+
+        if (this.bossAtivo()) {
+            this.bossContraGolpe(outroJogador);
+            if (this.faseConcluida) {
+                return;
+            }
+        }
+
+        this.avancarTurno();
+    }
+
+    processarAtaque(atacante, alvoJogador) {
+        const golpe = this.faseAtual.obterGolpeAleatorio(atacante.classe);
+        const variacao = Math.floor(Math.random() * 5);
+        const bonusSinergia = atacante.sinergiaBonus > 0 ? atacante.consumirSinergia() : 0;
+        const bonusTexto = bonusSinergia > 0 ? ` (+${bonusSinergia} de sinergia)` : '';
+
+        if (this.bossAtivo()) {
+            const danoBase = golpe.dano + variacao + bonusSinergia;
+            const danoTotal = Math.max(0, Math.round(danoBase));
+            this.boss.hp = Math.max(0, this.boss.hp - danoTotal);
+            atacante.animarAtaque(golpe.efeito || 'impact');
+            this.animarBossImpacto(golpe.efeito || 'impact');
+            const detalhe = golpe.descricao ? ` ${golpe.descricao}` : '';
+            this.adicionarLog(atacante.nome, `Atacou ${this.boss.nome} com ${golpe.nome} causando ${danoTotal} de dano${bonusTexto}.${detalhe}`);
+            this.atualizarBossPainel();
+            if (this.boss.hp === 0) {
+                this.resolverBossDerrota(atacante);
+            }
+        } else if (alvoJogador) {
+            const danoTotal = alvoJogador.receberDano(golpe.dano + variacao + bonusSinergia);
+            atacante.animarAtaque(golpe.efeito || 'impact');
+            alvoJogador.receberImpacto(golpe.efeito || 'impact');
+            const detalhe = golpe.descricao ? ` ${golpe.descricao}` : '';
+            this.adicionarLog(atacante.nome, `Desferiu ${golpe.nome} causando ${danoTotal} de dano${bonusTexto}.${detalhe}`);
+            if (!alvoJogador.estaVivo()) {
+                this.resolverDueloVitoria(atacante, alvoJogador);
+            }
+        }
+    }
+
+    bossAtivo() {
+        return Boolean(this.boss && this.boss.hp > 0);
+    }
+
+    bossContraGolpe(alvo) {
+        if (!this.bossAtivo() || !alvo) return;
+        const ataque = this.faseAtual.obterAtaqueBoss();
+        if (!ataque) return;
+        const variacao = Math.floor(Math.random() * 6);
+        const danoTotal = alvo.receberDano(ataque.dano + variacao);
+        this.animarBossAtaque();
+        alvo.receberImpacto(ataque.efeito || 'impact');
+        const detalhe = ataque.descricao ? ` ${ataque.descricao}` : '';
+        this.adicionarLog(this.boss.nome, `Golpeou ${alvo.nome} com ${ataque.nome} causando ${danoTotal} de dano.${detalhe}`);
+        if (!alvo.estaVivo()) {
+            this.resolverDerrotaEquipe(alvo);
+        }
+    }
+
+    animarBossAtaque() {
+        if (!this.bossSprite) return;
+        this.bossSprite.classList.remove('boss-attack');
+        void this.bossSprite.offsetWidth;
+        this.bossSprite.classList.add('boss-attack');
+    }
+
+    animarBossImpacto(efeito) {
+        if (!this.bossSprite) return;
+        const classes = ['boss-hit', 'hit-impact', 'hit-slash', 'hit-tech', 'hit-shadow'];
+        classes.forEach((classe) => this.bossSprite.classList.remove(classe));
+        void this.bossSprite.offsetWidth;
+        const classeBase = efeito ? `hit-${efeito}` : 'hit-impact';
+        this.bossSprite.classList.add('boss-hit', classeBase);
+        window.setTimeout(() => {
+            this.bossSprite?.classList.remove('boss-hit');
+            this.bossSprite?.classList.remove(classeBase);
+        }, 500);
+    }
+
+    resolverBossDerrota(jogadorFinal) {
+        this.faseConcluida = true;
+        this.vencedorAtual = jogadorFinal;
+        this.adicionarLog('Narrador', `${this.boss.nome} foi desmontado! Preparar próximo salto.`);
+        this.mostrarBrutal('PLANETA LIBERADO!');
+        this.nextPhaseBtn.disabled = false;
+        this.nextPhaseBtn.textContent = this.faseIndex < this.fases.length - 1 ? 'Próximo salto planetário' : 'Destino final';
+        this.actionButtons.forEach((btn) => {
+            btn.disabled = true;
+        });
+    }
+
+    resolverDerrotaEquipe(alvo) {
+        this.faseConcluida = true;
+        this.derrotaNaFase = true;
+        this.adicionarLog('Narrador', `${alvo.nome} tombou diante de ${this.boss.nome}. Recalculem o drip!`);
+        this.mostrarBrutal('DERROTA!');
+        this.nextPhaseBtn.disabled = false;
+        this.nextPhaseBtn.textContent = 'Reiniciar rota';
+        this.actionButtons.forEach((btn) => {
+            btn.disabled = true;
+        });
+    }
+
+    resolverDueloVitoria(vencedor, derrotado) {
+        this.faseConcluida = true;
+        this.vencedorAtual = vencedor;
+        this.campeonatoConcluido = true;
+        this.adicionarLog('Narrador', `${vencedor.nome} traiu ${derrotado.nome} e tomou o título de Mogger Supremo!`);
+        this.mostrarBrutal('TRAIÇÃO!');
+        this.nextPhaseBtn.disabled = false;
+        this.nextPhaseBtn.textContent = 'Reiniciar jornada';
+        this.actionButtons.forEach((btn) => {
+            btn.disabled = true;
+        });
+    }
+
+    mostrarBrutal(texto) {
+        this.brutalBanner.textContent = texto;
+        this.brutalBanner.classList.add('visible');
+    }
+
+    ocultarBrutal() {
+        this.brutalBanner.classList.remove('visible');
+    }
+
+    processarProximoSalto() {
+        if (this.campeonatoConcluido) {
+            this.reiniciarJogo();
+            return;
+        }
+
+        if (this.derrotaNaFase) {
+            this.reiniciarJogo();
+            return;
+        }
+
         if (!this.faseConcluida) {
-            this.avancarTurno();
+            return;
+        }
+
+        if (this.faseIndex < this.fases.length - 1) {
+            const proximoIndice = this.faseIndex + 1;
+            const jogadorInicial = this.vencedorAtual || this.jogadores[this.turnoJogadorIndex];
+            this.iniciarFase(proximoIndice, jogadorInicial);
+        } else {
+            this.reiniciarJogo();
         }
     }
 
@@ -153,61 +346,12 @@ export class Jogo {
         this.atualizarListaHabilidades();
     }
 
-    resolverVitoria(vencedor) {
-        this.faseConcluida = true;
-        this.vencedorAtual = vencedor;
-        vencedor.vitorias += 1;
-        this.adicionarLog('Narrador', `${vencedor.nome} dominou a ${this.faseAtual.nome}!`);
-        this.mostrarBrutal('BRUTAL!');
-        this.timeTravelBtn.disabled = false;
-        this.actionButtons.forEach((btn) => {
-            if (btn.dataset.action !== 'viajar') {
-                btn.disabled = true;
-            }
-        });
-        if (this.faseIndex === this.fases.length - 1) {
-            this.declararChadSupremo(vencedor);
-        }
-    }
-
-    mostrarBrutal(texto) {
-        this.brutalBanner.textContent = texto;
-        this.brutalBanner.classList.add('visible');
-    }
-
-    ocultarBrutal() {
-        this.brutalBanner.classList.remove('visible');
-    }
-
-    processarViagemTemporal() {
-        if (this.campeonatoConcluido) {
-            this.reiniciarJogo();
-            return;
-        }
-
-        if (!this.faseConcluida || !this.vencedorAtual) {
-            return;
-        }
-
-        if (this.faseIndex < this.fases.length - 1) {
-            this.iniciarFase(this.faseIndex + 1, this.vencedorAtual);
-        } else {
-            this.declararChadSupremo(this.vencedorAtual);
-        }
-    }
-
-    declararChadSupremo(vencedor) {
-        this.campeonatoConcluido = true;
-        this.mostrarBrutal('CHAD SUPREMO!');
-        this.adicionarLog('Narrador', `${vencedor.nome} tornou-se o Chad Supremo!`);
-        this.timeTravelBtn.disabled = false;
-        this.timeTravelBtn.textContent = 'Reiniciar Eras';
-    }
-
     reiniciarJogo() {
         this.jogadores.forEach((jogador) => {
             jogador.vitorias = 0;
         });
+        this.brutalBanner.classList.remove('visible');
+        this.brutalBanner.textContent = 'BRUTAL!';
         this.iniciarFase(0, this.jogadores[0]);
     }
 }
