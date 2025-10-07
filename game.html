@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betas Through Space: Arena</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/eras.css">
+</head>
+<body class="planet planet-aurora">
+    <div id="space-intro" class="space-intro">
+        <div class="intro-skip">Clique para saltar a abertura</div>
+        <div class="intro-crawl">
+            <p class="episode">Episódio ∞</p>
+            <h2>BETAS THROUGH SPACE</h2>
+            <p>Em um canto remoto da galáxia, dois betinhas vagam sem drip e sem rumo.</p>
+            <p>Depois de fugirem da Federação dos Chads, eles juraram se ajudar em cada planeta estranho que encontrarem.</p>
+            <p>Mas a cada vitória surge uma tentação cósmica: só um pode reivindicar o título de Mogger Supremo.</p>
+            <p>Rume com eles por nebulosas, sucatas espaciais e luas traiçoeiras, onde alianças frágeis serão testadas.</p>
+            <p>No fim da jornada, amizade ou traição decidirá quem dominará o mogging universal.</p>
+        </div>
+    </div>
+    <header class="hud">
+        <div class="era-banner">
+            <h1>Betas Through Space</h1>
+            <p>Planeta atual: <span id="era-label">Aurora Prisma</span></p>
+        </div>
+        <div class="scoreboard">
+            <article id="player-panel-1" class="player-panel">
+                <h2 class="player-name" id="player-name-1">Jogador 1</h2>
+                <p class="player-class" id="player-class-1">Classe</p>
+                <div class="hp-bar"><div class="hp-fill" id="hp-fill-1"></div></div>
+                <span class="hp-value" id="hp-value-1">120 / 120</span>
+            </article>
+            <article id="boss-panel" class="boss-panel hidden">
+                <h2 id="boss-name">Guardião</h2>
+                <p id="boss-desc">Sentinela planetária</p>
+                <div class="hp-bar boss-bar"><div class="hp-fill" id="boss-hp-fill"></div></div>
+                <span class="hp-value" id="boss-hp-value">0 / 0</span>
+            </article>
+            <article id="player-panel-2" class="player-panel">
+                <h2 class="player-name" id="player-name-2">Jogador 2</h2>
+                <p class="player-class" id="player-class-2">Classe</p>
+                <div class="hp-bar"><div class="hp-fill" id="hp-fill-2"></div></div>
+                <span class="hp-value" id="hp-value-2">120 / 120</span>
+            </article>
+        </div>
+    </header>
+
+    <main class="arena">
+        <section class="fighters">
+            <div id="fighter1" class="fighter sprite-left"></div>
+            <div id="boss" class="boss-sprite"></div>
+            <div id="fighter2" class="fighter sprite-right"></div>
+            <div id="brutal" class="brutal-banner">BRUTAL!</div>
+        </section>
+        <aside class="abilities">
+            <h3>Habilidades disponíveis</h3>
+            <ul id="habilidades-list" class="habilidades-list"></ul>
+        </aside>
+        <section class="controls">
+            <div class="buttons">
+                <button data-action="atacar" class="action-button">Atacar</button>
+                <button data-action="defender" class="action-button">Defender</button>
+                <button data-action="sinergia" class="action-button">Sinergizar</button>
+                <button id="next-phase" class="phase-button" disabled>Próximo salto planetário</button>
+            </div>
+            <div class="log">
+                <h3>Log de Missão</h3>
+                <table id="log-table" class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Turno</th>
+                            <th>Autor</th>
+                            <th>Evento</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-message">
+        <p>Que o beta mais engenhoso domine o mogging intergaláctico.</p>
+    </footer>
+
+    <script type="module" src="js/eventos.js"></script>
+</body>
+</html>
